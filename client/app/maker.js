@@ -15,6 +15,24 @@ const handleDomo = (e) => {
     return false;
 }
 
+const handleRemove = (e) => {
+    e.preventDefault();
+
+    $("#domoMessage").animate({width:'hide'}, 350);
+    
+    var selectedDomos = $('#removeDomos input[type=checkbox]:checked');
+    if(selectedDomos.length === 0) {
+        handleError('RAWR! You must select domos to remove');
+        return false;
+    }
+
+    sendAjax('POST', $('#domoRemoveForm').attr('action'), selectedDomos, function() {
+        loadDomosFromServer();
+    });
+
+    return false;
+}
+
 const DomoForm = (props) => {
     return (
         <form id='domoForm'
@@ -47,6 +65,7 @@ const DomoList = function(props) {
     const domoNodes = props.domos.map(function(domo) {
         return (
             <div key={domo._id} className='domo'>
+                <input className='domoSelect' type='checkbox' name='select' />
                 <img src='/assets/img/domoface.jpeg' alt='domo face' className='domoFace' />
                 <h3 className='domoName'>Name: {domo.name}</h3>
                 <h3 className='domoHeight'> Height: {domo.height}</h3>
@@ -70,6 +89,18 @@ const loadDomosFromServer = () => {
     });
 };
 
+const DomoRemove = () => {
+    return (
+        <form id='domoRemoveForm'
+            onSubmit={handleRemove}
+            name='domoRemoveForm'
+            action='/remove'
+            method='POST'>
+                <input className='makeDomoSubmit' type='submit' value='Remove Domos'/>
+            </form>
+    );
+}
+
 const setup = function(csrf) {
     ReactDOM.render(
         <DomoForm csrf={csrf} />, document.querySelector('#makeDomo')
@@ -77,6 +108,10 @@ const setup = function(csrf) {
 
     ReactDOM.render(
         <DomoList domos={[]} />, document.querySelector('#domos')
+    );
+
+    ReactDOM.render(
+        <DomoRemove />, document.querySelector('#removeDomos')
     );
 
     loadDomosFromServer();

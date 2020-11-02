@@ -57,8 +57,14 @@ const getDomos = (request, response) => {
   });
 };
 
+const removeDomo = (request, response) => {
+  const req = request;
+  const res = response;
+}
+
 module.exports = {
   makerPage,
   make: makeDomo,
   getDomos,
+  remove: removeDomo,
 };

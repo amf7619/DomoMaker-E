@@ -17,6 +17,24 @@ var handleDomo = function handleDomo(e) {
   return false;
 };
 
+var handleRemove = function handleRemove(e) {
+  e.preventDefault();
+  $("#domoMessage").animate({
+    width: 'hide'
+  }, 350);
+  var selectedDomos = $('#removeDomos input[type=checkbox]:checked');
+
+  if (selectedDomos.length === 0) {
+    handleError('RAWR! You must select domos to remove');
+    return false;
+  }
+
+  sendAjax('POST', $('#domoRemoveForm').attr('action'), selectedDomos, function () {
+    loadDomosFromServer();
+  });
+  return false;
+};
+
 var DomoForm = function DomoForm(props) {
   return /*#__PURE__*/React.createElement("form", {
     id: "domoForm",
@@ -70,7 +88,11 @@ var DomoList = function DomoList(props) {
     return /*#__PURE__*/React.createElement("div", {
       key: domo._id,
       className: "domo"
-    }, /*#__PURE__*/React.createElement("img", {
+    }, /*#__PURE__*/React.createElement("input", {
+      className: "domoSelect",
+      type: "checkbox",
+      name: "select"
+    }), /*#__PURE__*/React.createElement("img", {
       src: "/assets/img/domoface.jpeg",
       alt: "domo face",
       className: "domoFace"
@@ -95,6 +117,20 @@ var loadDomosFromServer = function loadDomosFromServer() {
   });
 };
 
+var DomoRemove = function DomoRemove() {
+  return /*#__PURE__*/React.createElement("form", {
+    id: "domoRemoveForm",
+    onSubmit: handleRemove,
+    name: "domoRemoveForm",
+    action: "/remove",
+    method: "POST"
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "makeDomoSubmit",
+    type: "submit",
+    value: "Remove Domos"
+  }));
+};
+
 var setup = function setup(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(DomoForm, {
     csrf: csrf
@@ -102,6 +138,7 @@ var setup = function setup(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(DomoList, {
     domos: []
   }), document.querySelector('#domos'));
+  ReactDOM.render( /*#__PURE__*/React.createElement(DomoRemove, null), document.querySelector('#removeDomos'));
   loadDomosFromServer();
 };
 
